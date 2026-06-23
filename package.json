@@ -1,10 +1,26 @@
 {
   "name": "productivity-timer-desktop",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A minimalist frameless productivity timer",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron ."
+    "dev": "electron .",
+    "build": "electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.productivity.timer",
+    "productName": "Productivity Timer",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^42.4.1",
+    "electron-builder": "^26.15.3"
   }
 }

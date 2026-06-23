@@ -15,7 +15,7 @@ A beautiful, deep dark minimalist productivity timer built for macOS using Elect
 You can easily install the app permanently on your Mac using the pre-built installer:
 
 1. Open the `dist/` folder in this project.
-2. Double-click the **`Productivity Timer-1.0.0-arm64.dmg`** file.
+2. Double-click the **`Productivity Timer-0.1.0-arm64.dmg`** file.
 3. A small window will appear. Drag and drop the **Productivity Timer** icon into the **Applications** folder shortcut.
 4. You can now launch the app anytime from your Mac's **Launchpad** or **Applications** folder!
 
