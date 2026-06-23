@@ -1,0 +1,10 @@
+{
+  "name": "productivity-timer-desktop",
+  "version": "1.0.0",
+  "description": "A minimalist frameless productivity timer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron ."
+  }
+}
