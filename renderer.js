@@ -5,6 +5,9 @@ let isRunning = false;
 let timeElapsed = 0; // for stopwatch
 let timeRemaining = 25 * 60; // for countdowns
 let timerInterval = null;
+let isAlarmPlaying = false;
+let alarmInterval = null;
+
 
 // DOM Elements
 const timeDisplay = document.getElementById('timeDisplay');
@@ -13,7 +16,10 @@ const playIcon = document.getElementById('playIcon');
 const pauseIcon = document.getElementById('pauseIcon');
 const resetBtn = document.getElementById('resetBtn');
 const modeBtns = document.querySelectorAll('.mode-btn');
+const minimizeBtn = document.getElementById('minimizeBtn');
 const closeBtn = document.getElementById('closeBtn');
+const decreaseTimeBtn = document.getElementById('decreaseTimeBtn');
+const increaseTimeBtn = document.getElementById('increaseTimeBtn');
 
 const MODES = {
     stopwatch: 0,
@@ -21,6 +27,50 @@ const MODES = {
     shortBreak: 5 * 60,
     custom: 15 * 60
 };
+
+// Alarm Logic
+function playAlarmSound() {
+    if (isAlarmPlaying) return;
+    isAlarmPlaying = true;
+    
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    
+    let playBeep = () => {
+        if (!isAlarmPlaying) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.1);
+        
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.type = 'square';
+        osc2.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
+        gain2.gain.setValueAtTime(0.1, ctx.currentTime + 0.2);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc2.start(ctx.currentTime + 0.2);
+        osc2.stop(ctx.currentTime + 0.3);
+    };
+
+    playBeep();
+    alarmInterval = setInterval(playBeep, 1000);
+    setTimeout(stopAlarm, 10000); // stop after 10s
+}
+
+function stopAlarm() {
+    isAlarmPlaying = false;
+    clearInterval(alarmInterval);
+}
 
 // Format Time
 function formatTime(seconds) {
@@ -59,6 +109,14 @@ function updateUI() {
         playPauseBtn.classList.remove('pomodoro-active');
         document.querySelector('.mode-btn.active')?.classList.remove('pomodoro-active');
     }
+
+    if (currentMode === 'custom') {
+        decreaseTimeBtn.classList.add('always-visible');
+        increaseTimeBtn.classList.add('always-visible');
+    } else {
+        decreaseTimeBtn.classList.remove('always-visible');
+        increaseTimeBtn.classList.remove('always-visible');
+    }
 }
 
 // Timer Logic
@@ -75,7 +133,7 @@ function startTimer() {
             if (timeRemaining <= 0) {
                 pauseTimer();
                 timeRemaining = 0;
-                // Optional: Play sound or notification here
+                playAlarmSound();
             }
         }
         updateUI();
@@ -90,6 +148,7 @@ function pauseTimer() {
 }
 
 function resetTimer() {
+    stopAlarm();
     pauseTimer();
     timeElapsed = 0;
     timeRemaining = MODES[currentMode];
@@ -109,6 +168,7 @@ function switchMode(mode) {
 
 // Event Listeners
 playPauseBtn.addEventListener('click', () => {
+    stopAlarm();
     isRunning ? pauseTimer() : startTimer();
 });
 
@@ -123,8 +183,34 @@ modeBtns.forEach(btn => {
     });
 });
 
+minimizeBtn.addEventListener('click', () => {
+    ipcRenderer.send('minimize-app');
+});
+
 closeBtn.addEventListener('click', () => {
     ipcRenderer.send('close-app');
+});
+
+decreaseTimeBtn.addEventListener('click', () => {
+    stopAlarm();
+    if (currentMode === 'stopwatch') {
+        timeElapsed = Math.max(0, timeElapsed - 60);
+    } else {
+        timeRemaining = Math.max(0, timeRemaining - 60);
+        if (currentMode === 'custom') MODES.custom = timeRemaining;
+    }
+    updateUI();
+});
+
+increaseTimeBtn.addEventListener('click', () => {
+    stopAlarm();
+    if (currentMode === 'stopwatch') {
+        timeElapsed += 60;
+    } else {
+        timeRemaining += 60;
+        if (currentMode === 'custom') MODES.custom = timeRemaining;
+    }
+    updateUI();
 });
 
 // Init

@@ -8,7 +8,9 @@ function createWindow() {
         frame: false, // Frameless window
         transparent: true, // Transparent background to allow custom CSS rounded corners
         alwaysOnTop: true, // Floats like a widget
-        resizable: false,
+        resizable: true,
+        minWidth: 250,
+        minHeight: 150,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -17,8 +19,15 @@ function createWindow() {
 
     mainWindow.loadFile('index.html');
 
+    ipcMain.removeAllListeners('close-app');
+    ipcMain.removeAllListeners('minimize-app');
+
     ipcMain.on('close-app', () => {
         app.quit();
+    });
+
+    ipcMain.on('minimize-app', () => {
+        mainWindow.minimize();
     });
 }
 

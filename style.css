@@ -18,16 +18,6 @@ body {
     overflow: hidden;
 }
 
-.drag-region {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    -webkit-app-region: drag; /* Makes the window draggable */
-    z-index: 1;
-}
-
 .app-container {
     background-color: #0d0d0d;
     width: 100%;
@@ -40,7 +30,7 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     position: relative;
     z-index: 2;
-    -webkit-app-region: no-drag; /* Clickable elements should not drag */
+    -webkit-app-region: drag;
 }
 
 /* Header */
@@ -65,6 +55,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-app-region: no-drag;
 }
 
 .mode-btn {
@@ -87,21 +78,61 @@ button {
     background-color: #e65c50; /* Muted Red / Soft Amber */
 }
 
-.close-btn {
+.window-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.minimize-btn, .close-btn {
     width: 24px;
     height: 24px;
     border-radius: 50%;
     opacity: 0.3;
 }
+
+.minimize-btn:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
 .close-btn:hover {
     opacity: 1;
     background-color: rgba(255, 50, 50, 0.2);
     color: #ff5555;
 }
 
+/* Timer Container */
+.timer-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.time-adjust-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.05);
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.timer-container:hover .time-adjust-btn,
+.time-adjust-btn.always-visible {
+    opacity: 1;
+}
+
+.time-adjust-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
 /* Timer Display */
 .timer-display {
-    flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
